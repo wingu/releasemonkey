@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+  <title>Release Monkey</title>
+  <link href="static/bootstrap.css" rel="stylesheet" />
+</head>
+<body>
+<div class="topbar">
+  <div class="fill">
+    <div class="container">
+      <a class="brand" href="/">Wingu ReleaseMonkey</a>
+      <ul class="nav">
+        <li><a href="{{ url_for('in_progress') }}">In Progress</a></li>
+	<li><a href="{{ url_for('new_release') }}">Start New Release</a></li>
+        <li><a href="{{ url_for('old_releases') }}">Old Releases</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="container">
+{% block body %}{% endblock %}
+</div> <!-- end container -->
+</body>
+</html>

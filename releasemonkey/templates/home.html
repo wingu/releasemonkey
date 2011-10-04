@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="hero-unit">
+  <h3>Welcome to ReleaseMonkey</h3>
+  {% if in_progress_release %}
+    <p>There is a currently a release in progress.</p>
+    <p><a class="btn primary large" href="{{ url_for('in_progress') }}">View in progress release &raquo;</a></p>
+  {% else %}
+    <p>There is a currently no release in progress.</p>
+    <p><a class="btn primary large" href="{{ url_for('new_release') }}">Start a new release &raquo;</a></p>
+  {% endif %}
+</div> <!-- end hero-unit -->
+{% endblock %}

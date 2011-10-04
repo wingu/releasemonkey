@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="hero-unit">
+  <h3>Fill in the details for the new release</h3>
+  <form action="{{ url_for('create_release') }}">
+    <label id="release_name">Release Name</label>
+    <div class="input">
+      <input type="text" id="release_name" name="release_name" 
+	     value="{{ suggested_release_name }}" />
+    </div>
+    <label id="release_revision">Release Revision</label>
+    <div class="input">
+      <ul class="inputs-list">
+	{% for revision in recent_revisions %}
+        <li>  
+	  <label>
+            <input type="radio" name="release_revision" 
+		   value="{{ revision.revision }}" />
+            <span><a href="{{ revision.link }}"
+		     target="__blank">{{ revision.revision }}</a> 
+	      {{ revision.format_short_msg() }}</span>
+          </label>
+        </li>
+        {% endfor %}
+        <li>
+          <label>
+            <input type="radio" checked name="release_revision" value="custom" />
+            <span>Custom revision: <input type="text" name="custom_revision"
+					  id="custom_revision" value="" /></span>
+          </label>
+        </li>
+      </ul>
+    </div>
+    <div class="actions">
+      <input type="submit" class="btn primary" value="Start Release" />
+    </div>
+  </form>
+</div> <!-- end hero-unit -->
+{% endblock %}
