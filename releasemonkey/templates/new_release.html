@@ -2,7 +2,7 @@
 {% block body %}
 <div class="hero-unit">
   <h3>Fill in the details for the new release</h3>
-  <form action="{{ url_for('create_release') }}">
+  <form action="{{ url_for('create_release') }}" method="POST">
     <label id="release_name">Release Name</label>
     <div class="input">
       <input type="text" id="release_name" name="release_name" 

@@ -1,57 +1,13 @@
-from flask import Flask, g, render_template, redirect, url_for
+import sys
 
-
-class Revision(object):
-
-    def __init__(self, 
-                 revision,
-                 author,
-                 msg,
-                 link):
-        self.revision = revision
-        self.author = author
-        self.msg = msg
-        self.link = link
-
-    def format_short_msg(self):
-        return "%s %s" % (self.author, self.msg)
-
-
-class MockRepo(object):
-    
-    def recent_revisions(self):
-        r1 = Revision('234',
-                      'ewj',
-                      'this is the msg',
-                      'http://link')
-        r2 = Revision('235',
-                      'someone',
-                      'this is the msg 2',
-                      'http://link2')
-        return [r2, r1]
-
-
-class MockReleases(object):
-    
-    def in_progress(self):
-        return None
-
-    def suggested_release_name(self):
-        return "the new release"
-
-DEBUG = True
-SECRET_KEY = 'wingu'
-REPO = MockRepo
-RELEASES = MockReleases
+from flask import Flask, g, render_template, redirect, url_for, request
 
 app = Flask(__name__)
 
-app.config.from_object(__name__)
-
 @app.before_request
 def before_request():
-    g.repo = REPO()
-    g.releases = RELEASES()
+    g.repo = app.config['REPO']
+    g.releases = app.config['RELEASES']
     
 @app.route('/')
 def home():
@@ -82,9 +38,35 @@ def in_progress():
         return render_template('no_in_progress.html')
     return render_template('in_progress.html')
 
-@app.route('/create_release')
+@app.route('/create_release', methods=['POST'])
 def create_release():
+    releases = g.releases
+    repo = g.repo
+    
+    release_name = request.form['release_name']
+    release_revision = request.form['release_revision']
+    if release_revision == 'custom':
+        release_revision = request.form['custom_revision']
+
+    try:
+        repo.tag_release(release_name, release_revision)
+        releases.create_release(release_name, release_revision)        
+    except Exception as exc:
+        # even though technically both of these could not have been
+        # created with the exception having been thrown, we don't want
+        # implementers to depend on the order of tagging / release
+        # creation, so we insist that both untag_release and
+        # destroy_release are safe as no-ops if the tag or release
+        # doesn't exist, and call them both.
+        repo.untag_release(release_name, release_revision)
+        releases.destroy_release(release_name, release_revision)
+        return render_template('error.html', 
+                               error_msg='Could not create the new release.',
+                               error_detail=str(exc))
+
     return redirect(url_for('in_progress'))
 
 if __name__ == '__main__':
+    config_module = sys.argv[1]
+    app.config.from_object(config_module)
     app.run()
