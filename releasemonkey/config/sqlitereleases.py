@@ -104,7 +104,7 @@ class SqliteReleases(object):
             raise
 
     def destroy_release(self, release_name):
-        release = self.db_session.query(Release).filter_by(name=release_name).first()
+        release = self.db_session.query(Release).filter_by(name=release_name)
         if release:
             release.delete()
             try:
