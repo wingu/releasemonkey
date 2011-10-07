@@ -87,9 +87,15 @@ def delete_release():
     g.releases.destroy_release(request.form['release_name'])
     return redirect(url_for('in_progress'))
 
-@app.route('/release_detail/<release_name>')
+@app.route('/release_detail/<release_name>/')
 def release_detail(release_name):
-    pass
+    releases = g.releases
+    
+    release = releases.find_release(release_name)
+    if not release:
+        return render_template('release_not_found.html',
+                               release_name=release_name), 404
+
 
 
 if __name__ == '__main__':

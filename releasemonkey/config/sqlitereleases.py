@@ -94,9 +94,8 @@ class SqliteReleases(object):
             self.db_session.rollback()
             raise
 
-
     def destroy_release(self, release_name):
-        release = self.db_session.query(Release).filter_by(name=release_name)
+        release = self.db_session.query(Release).filter_by(name=release_name).first()
         if release:
             release.delete()
             try:
@@ -104,6 +103,9 @@ class SqliteReleases(object):
             except:
                 # TODO LOG
                 self.db_session.rollback()
+    
+    def find_release(self, release_name):
+        return self.db_session.query(Release).filter_by(name=release_name).first()
 
 
 RELEASES = SqliteReleases(db_session)
