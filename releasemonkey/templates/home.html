@@ -3,11 +3,11 @@
 <div class="hero-unit">
   <h3>Welcome to ReleaseMonkey</h3>
   {% if in_progress_release %}
-    <p>There is a currently a release in progress.</p>
-    <p><a class="btn primary large" href="{{ url_for('in_progress') }}">View in progress release &raquo;</a></p>
+    <p>There are currently releases in progress.</p>
+    <p><a class="btn large" href="{{ url_for('in_progress') }}">View in progress releases &raquo;</a></p>
   {% else %}
-    <p>There is a currently no release in progress.</p>
-    <p><a class="btn primary large" href="{{ url_for('new_release') }}">Start a new release &raquo;</a></p>
+    <p>There are currently no releases in progress.</p>
   {% endif %}
+    <p><a class="btn large" href="{{ url_for('new_release') }}">Start a new release &raquo;</a></p>
 </div> <!-- end hero-unit -->
 {% endblock %}

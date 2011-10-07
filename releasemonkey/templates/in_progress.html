@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="hero-unit">
+  <h3>Releases in Progress</h3>
+  {% for release in in_progress_releases %}
+  <div class="alert-message block-message info">
+    <div>Name: <a href="{{ url_for('release_detail', release_name=release.name) }}">
+	{{ release.name }}</a>
+       <span>({{ release.count_open_commits() }}/{{ release.count_total_commits() }})</span></div>
+    <div>From revision: {{ release.from_revision }}</div>
+    <div>To revision: {{ release.to_revision }}</div>
+    <form action="{{ url_for('delete_release') }}" method="POST">
+      <input type="hidden" name="release_name" id="release_name" value="{{ release.name }}" />
+      <input type="submit" onClick="return confirmDelete();" class="btn primary" value="Delete" />
+    </form>
+  </div>
+  {% endfor %}
+</div> <!-- end hero-unit -->
+{% endblock %}
