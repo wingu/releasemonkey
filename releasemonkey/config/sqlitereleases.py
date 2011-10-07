@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, Text
 from sqlalchemy import ForeignKey
 
+# TODO this should take from a config file.
 engine = create_engine('sqlite:///test.db', convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
@@ -16,7 +17,7 @@ class Commit(Base):
     __tablename__ = 'commits'
     id = Column(Integer(), primary_key=True)
     revision = Column(Text())
-    is_open = Boolean()
+    is_verified = Column(Boolean())
     release_id = Column(Integer(), ForeignKey('releases.id'))
     release = relationship('Release', 
                            backref=backref('commits', order_by=revision))
@@ -24,13 +25,21 @@ class Commit(Base):
     msg = Column(Text())
     link = Column(Text())
 
+    MAX_SNIPPET_LEN = 255
+
     def __init__(self, release_id, revision, author, msg, link):
         self.release_id = release_id
         self.revision = revision
         self.author = author
         self.msg = msg
         self.link = link
-        self.is_open = True
+        self.is_verified = False
+
+    def msg_snippet(self):
+        if len(self.msg) > self.MAX_SNIPPET_LEN:
+            return self.msg[:self.MAX_SNIPPET_LEN] + '...'
+        else:
+            return self.msg
 
 class Release(Base):
     __tablename__ = 'releases'
@@ -49,8 +58,8 @@ class Release(Base):
     def __repr__(self):
         return '<Release %r>' % (self.name)
 
-    def count_open_commits(self):
-        return len([c for c in self.commits if c.is_open])
+    def count_unverified_commits(self):
+        return len([c for c in self.commits if not c.is_verified])
 
     def count_total_commits(self):
         return len(self.commits)
@@ -107,6 +116,21 @@ class SqliteReleases(object):
     def find_release(self, release_name):
         return self.db_session.query(Release).filter_by(name=release_name).first()
 
+    def verify_commit(self, commit_id, verified):
+        if verified:
+            verified = 1
+        else:
+            verified = 0
 
+        commit = self.db_session.query(Commit).filter_by(id=commit_id).one()
+        commit.is_verified = verified
+
+        try:
+            self.db_session.commit()
+        except:
+            # TODO log
+            self.db_session.rollback()
+
+            
 RELEASES = SqliteReleases(db_session)
 TEARDOWNS = [remove_db_session]

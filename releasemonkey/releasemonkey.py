@@ -1,6 +1,6 @@
 import sys
 
-from flask import Flask, g, render_template, redirect, url_for, request
+from flask import Flask, g, render_template, redirect, url_for, request, jsonify
 
 app = Flask(__name__)
 
@@ -95,8 +95,19 @@ def release_detail(release_name):
     if not release:
         return render_template('release_not_found.html',
                                release_name=release_name), 404
+    return render_template('release_detail.html',
+                           release=release)
 
-
+@app.route('/verify_commit', methods=['POST'])
+def verify_commit():
+    commit_id = request.form['commit_id']
+    new_checked = request.form['checked']
+    if new_checked == 'false':
+        new_checked = False
+    else:
+        new_checked = True
+    g.releases.verify_commit(commit_id, new_checked)
+    return jsonify({'checked': new_checked})
 
 if __name__ == '__main__':
     for config_module in sys.argv[1:]:

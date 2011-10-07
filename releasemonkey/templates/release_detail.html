@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="hero-unit">
+  <h3>Details for Release {{ release.name }}</h3>
+  <table class="zebra-striped">
+    <tr>
+      <th>Revision</th>
+      <th>Author</th>
+      <th>Commit Msg Snippet</th>
+      <th>Verified?</th>
+    </tr>
+    {% for commit in release.commits %}
+    <tr>
+      <td><span id="commit{{ commit.id }}-revision"
+	     class="{%if commit.is_verified %}verified{% else %}unverified{% endif %}"
+	     >{{ commit.revision }}</span></td>
+      <td>{{ commit.author }}</td>
+      <td>{{ commit.msg_snippet() }}</td>
+      <td><form><input type="checkbox" id="commit{{ commit.id }}" name="commit{{ commit.id }}" 
+		 class="checkable"
+		 {% if commit.is_verified %}checked{% endif %} /></form></td>
+		 </tr>
+    {% endfor %}
+  </table>
+
+</div> <!-- end hero-unit -->
+
+<script language="javascript" type="text/javascript">
+  $('.checkable').bind('click', function() {
+                        var checked = $(this).is(':checked');
+                        var spanId = '#' + this.id + '-revision';
+                        if(checked) {
+                          $(spanId).addClass('verified');
+                          $(spanId).removeClass('unverified');
+                        } else {
+                          $(spanId).addClass('unverified');
+                          $(spanId).removeClass('verified');
+                        }
+                                                
+                        $.ajax({
+                                 type: "POST",
+                                 url: "{{ url_for('verify_commit') }}",
+                                 data: { checked: checked,
+                                         commit_id: this.id.match(/\d/g)[0] },
+                                 error: function() {
+                                   alert('Trouble talking to server. Your view may be out of date, and you should refresh.');
+                                 }
+                               });
+                    });
+</script>
+
+{% endblock %}

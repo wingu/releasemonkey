@@ -1,0 +1,7 @@
+span.verified {
+    color: green;
+}
+
+span.unverified {
+    color: red;
+}
