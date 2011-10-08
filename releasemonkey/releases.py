@@ -5,8 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, Text
 from sqlalchemy import ForeignKey
 
-# TODO this should take from a config file.
-engine = create_engine('sqlite:///test.db', convert_unicode=True)
+engine = create_engine('sqlite:///releasemonkey.db', convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
@@ -67,7 +66,6 @@ class Release(Base):
 
 def init_db():
     Base.metadata.create_all(bind=engine)
-    # TODO add a trigger to make sure only one release can be in progress
 
 def remove_db_session():
     db_session.remove()
@@ -160,7 +158,9 @@ class SqliteReleases(object):
             self.db_session.rollback()
             raise
 
-
             
 RELEASES = SqliteReleases(db_session)
-TEARDOWNS = [remove_db_session]
+if 'TEARDOWNS' in globals():
+    TEARDOWNS.extend([remove_db_session])
+else:
+    TEARDOWNS = [remove_db_session]

@@ -134,6 +134,8 @@ def mark_release_finished(release_name, finished):
         
 
 if __name__ == '__main__':
-    for config_module in sys.argv[1:]:
+    configs = ['releases']
+    configs.extend(sys.argv[1:])
+    for config_module in configs:
         app.config.from_object(config_module)
     app.run()
