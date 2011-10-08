@@ -40,7 +40,9 @@ def new_release():
 
 @app.route('/old_releases')
 def old_releases():
-    return render_template('old_releases.html')
+    finished_releases=g.releases.finished()
+    return render_template('old_releases.html',
+                           finished_releases=finished_releases)
 
 @app.route('/in_progress')
 def in_progress():

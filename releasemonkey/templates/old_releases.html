@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="hero-unit">
+  <h3>Finished Releases</h3>
+  {% for release in finished_releases %}
+  <div class="alert-message block-message info">
+    <div>Name: {{ release.name }} <span>({{ release.count_total_commits() }} commits)</span></div>
+    <div>From revision: {{ release.from_revision }}</div>
+    <div>To revision: {{ release.to_revision }}</div>
+    <form action="{{ url_for('mark_release_finished', release_name=release.name, finished=False) }}" method="POST">
+      <input type="submit" class="btn primary" value="Re-open" />
+    </form>
+  </div>
+  {% endfor %}
+</div> <!-- end hero-unit -->
+{% endblock %}

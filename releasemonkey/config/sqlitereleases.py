@@ -80,6 +80,9 @@ class SqliteReleases(object):
     def in_progress(self):
         return self.db_session.query(Release).filter_by(in_progress=True)
 
+    def finished(self):
+        return self.db_session.query(Release).filter_by(in_progress=False)
+
     def suggested_release_name(self):
         return "sqlite_suggested_release"
 
