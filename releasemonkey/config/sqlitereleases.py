@@ -131,6 +131,33 @@ class SqliteReleases(object):
             # TODO log
             self.db_session.rollback()
 
+    def mark_release_finished(self, release_name):
+        release = self.find_release(release_name)
+        if not release:
+            raise Exception("Couldn't find release %s" % release_name)
+        unverified_count = release.count_unverified_commits()
+        if unverified_count:
+            err_msg = "Cannot mark release finished with %d unverified commits" % unverified_count
+            raise Exception(err_msg)
+        release.in_progress = False
+        try:
+            self.db_session.commit()
+        except:
+            self.db_session.rollback()
+            raise
+
+    def mark_release_in_progress(self, release_name):
+        release = self.find_release(release_name)
+        if not release:
+            raise Exception("Couldn't find release %s" % release_name)
+        release.in_progress = True
+        try:
+            self.db_session.commit()
+        except:
+            self.db_session.rollback()
+            raise
+
+
             
 RELEASES = SqliteReleases(db_session)
 TEARDOWNS = [remove_db_session]

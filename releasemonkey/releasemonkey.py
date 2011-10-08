@@ -1,6 +1,7 @@
 import sys
 
-from flask import Flask, g, render_template, redirect, url_for, request, jsonify
+from flask import Flask, g, render_template
+from flask import redirect, url_for, request, jsonify
 
 app = Flask(__name__)
 
@@ -108,6 +109,21 @@ def verify_commit():
         new_checked = True
     g.releases.verify_commit(commit_id, new_checked)
     return jsonify({'checked': new_checked})
+
+@app.route('/finish_release/<release_name>/<finished>/', methods=['POST'])
+def mark_release_finished(release_name, finished):
+    if finished.lower() == 'true':
+        try:
+            g.releases.mark_release_finished(release_name)
+        except Exception as exc:
+            return render_template('error.html', 
+                                   error_msg='Could not mark release as finished',
+                                   error_detail=str(exc))
+    else:
+        g.releases.mark_release_in_progress(release_name)
+    return redirect('in_progress')
+        
+    
 
 if __name__ == '__main__':
     for config_module in sys.argv[1:]:
