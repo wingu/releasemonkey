@@ -64,21 +64,12 @@ def create_release():
         to_revision = request.form['custom_revision']
 
     try:
-        repo.tag_release(release_name, to_revision)
         commits = repo.revisions_between(from_revision, to_revision)
         releases.create_release(release_name, 
                                 from_revision, 
                                 to_revision, 
                                 commits)
     except Exception as exc:
-        # even though technically both of these could not have been
-        # created with the exception having been thrown, we don't want
-        # implementers to depend on the order of tagging / release
-        # creation, so we insist that both untag_release and
-        # destroy_release are safe as no-ops if the tag or release
-        # doesn't exist, and call them both.
-        #repo.untag_release(release_name, to_revision)
-        #releases.destroy_release(release_name)
         return render_template('error.html', 
                                error_msg='Could not create the new release.',
                                error_detail=str(exc))
@@ -114,18 +105,33 @@ def verify_commit():
 
 @app.route('/finish_release/<release_name>/<finished>/', methods=['POST'])
 def mark_release_finished(release_name, finished):
+    release = g.releases.find_release(release_name)
+    if not release:
+        return render_template('release_not_found.html',
+                               release_name=release_name), 404
+
     if finished.lower() == 'true':
-        try:
+        try:            
             g.releases.mark_release_finished(release_name)
+            g.repo.tag_release(release_name, release.to_revision)
         except Exception as exc:
+            # even though technically both of these could not have been
+            # created with the exception having been thrown, we don't want
+            # implementers to depend on the order of tagging / release
+            # creation, so we insist that both untag_release and
+            # mark_release_in_progress are safe as no-ops if the tag or release
+            # doesn't exist, and call them both.
+            g.repo.untag_release(release_name, release.to_revision)
+            g.releases.mark_release_in_progress(release_name)
             return render_template('error.html', 
                                    error_msg='Could not mark release as finished',
                                    error_detail=str(exc))
     else:
+        g.repo.untag_release(release_name, release.to_revision)
         g.releases.mark_release_in_progress(release_name)
+        
     return redirect('in_progress')
         
-    
 
 if __name__ == '__main__':
     for config_module in sys.argv[1:]:
