@@ -76,18 +76,19 @@ class SqliteReleases(object):
         self.db_session = db_session
 
     def in_progress(self):
-        return self.db_session.query(Release).filter_by(in_progress=True)
+        return self.db_session.query(Release).filter_by(in_progress=True).all()
 
     def finished(self):
-        return self.db_session.query(Release).filter_by(in_progress=False)
+        return self.db_session.query(Release).filter_by(in_progress=False).all()
 
     def suggested_release_name(self):
         return "sqlite_suggested_release"
 
     def create_release(self, release_name, from_revision, to_revision, commits):
         rel = Release(release_name, from_revision, to_revision, True)
-        self.db_session.add(rel)
+
         try:
+            self.db_session.add(rel)
             self.db_session.commit()
         except:
             self.db_session.rollback()
