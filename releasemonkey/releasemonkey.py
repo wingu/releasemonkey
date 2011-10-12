@@ -30,13 +30,9 @@ def new_release():
     releases = g.releases
     
     suggested_release_name = releases.suggested_release_name()
-    recent_revisions = repo.recent_revisions()
-    from_revision = repo.last_tagged_revision()
     
     return render_template('new_release.html',
-                           suggested_release_name=suggested_release_name,
-                           recent_revisions=recent_revisions,
-                           from_revision=from_revision)
+                           suggested_release_name=suggested_release_name)
 
 @app.route('/old_releases')
 def old_releases():
@@ -134,7 +130,7 @@ def mark_release_finished(release_name, finished):
         
 
 if __name__ == '__main__':
-    configs = ['releases']
+    configs = ['releases', 'svnrepo']
     configs.extend(sys.argv[1:])
     for config_module in configs:
         app.config.from_object(config_module)
