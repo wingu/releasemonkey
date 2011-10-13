@@ -51,7 +51,7 @@
                                  type: "POST",
                                  url: "{{ url_for('verify_commit') }}",
                                  data: { checked: checked,
-                                         commit_id: this.id.match(/\d/g)[0] },
+                                         commit_id: this.id.match(/\d+/g)[0] },
                                  error: function() {
                                    alert('Trouble talking to server. Your view may be out of date, and you should refresh.');
                                  }
