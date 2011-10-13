@@ -90,16 +90,12 @@ class SqliteReleases(object):
         try:
             self.db_session.add(rel)
             self.db_session.commit()
-        except:
-            self.db_session.rollback()
-            raise
-        for commit in commits:
-            self.db_session.add(Commit(release_id=rel.id,
-                                       revision=commit.revision,
-                                       msg=commit.msg,
-                                       author=commit.author,
-                                       link=commit.link))
-        try:
+            for commit in commits:
+                self.db_session.add(Commit(release_id=rel.id,
+                                           revision=commit.revision,
+                                           msg=commit.msg,
+                                           author=commit.author,
+                                           link=commit.link))
             self.db_session.commit()
         except:
             self.db_session.rollback()
