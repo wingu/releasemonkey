@@ -48,7 +48,7 @@ class SvnRepo(object):
             rev, author, date, num_comment_lines = [x.strip() for x in header.split('|')]
             rev = rev[1:]
             if rev != from_revision:
-                revs.append(Revision(rev, author, '\n'.join(lines[1:]), 'none'))
+                revs.append(Revision(rev, author, '\n'.join(l.decode('utf-8', 'replace') for l in lines[1:]), 'none'))
         
         return revs
 
