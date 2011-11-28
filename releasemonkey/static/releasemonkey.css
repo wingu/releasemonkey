@@ -5,3 +5,17 @@ span.verified {
 span.unverified {
     color: red;
 }
+
+input.filter {
+    color: #333;
+    float: right;
+}
+input.filter:-moz-placeholder {
+    color: #999 !important;
+}
+input.filter:-moz-placeholder {
+    color: #999 !important;
+}
+input.filter:placeholder {
+	color: #999 !important;
+}

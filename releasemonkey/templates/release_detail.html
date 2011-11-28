@@ -4,10 +4,11 @@
 <div class="hero-unit">
   <h3>Details for Release {{ release.name }}</h3>
   <div class="clearfix">
+    <input type="search" class="filter" placeholder="Filter commits" />
     <p>Revisions {{ release.from_revision }} to {{ release.to_revision }}</p>
   </div>
-  <table class="zebra-striped">
-    <tr>
+  <table class="zebra-striped commits">
+    <tr class="headers">
       <th>Revision</th>
       <th>Author</th>
       <th>Commit Msg Snippet</th>
@@ -57,6 +58,18 @@
                                  }
                                });
                     });
+  var updateTable = function() {
+      var value = $(this).val();
+      $('tr:contains("'+value+'")').show();
+      $('tr:not(:contains("'+value+'")):not(.headers)').hide();
+  };
+  $('.filter').bind('input', updateTable);
+  $('.filter').bind('textInput', updateTable);
+  $('.filter').bind('propertychange', updateTable);
+  $('.filter').bind('paste', updateTable);
+  $('.filter').bind('cut', updateTable);
+  $('.filter').bind('keydown', updateTable);
+  $('.filter').bind('drop', updateTable);
 </script>
 
 {% endblock %}
