@@ -2,3 +2,4 @@ env
 *~
 *.pyc
 releasemonkey/releasemonkey.db
+releasemonkey/releasemonkey.log
