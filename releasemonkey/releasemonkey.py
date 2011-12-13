@@ -72,6 +72,25 @@ def create_release():
 
     return redirect(url_for('in_progress'))
 
+@app.route('/alter_release/<release_name>', methods=['POST'])
+def alter_release(release_name):
+    releases = g.releases
+    repo = g.repo
+    new_to_revision = request.form['new_to_revision']
+    release = releases.find_release(release_name)
+    old_commits = release.commits
+    old_revisions = [c.revision for c in old_commits]
+    new_commits = repo.revisions_between(release.from_revision, new_to_revision)
+    
+    for new_commit in new_commits:
+        if new_commit.revision not in old_revisions:
+            app.logger.info("Adding revision %s" % new_commit.revision)
+            releases.add_commit_to_release(release, new_commit)
+
+    releases.change_to_revision(release, new_to_revision)
+    
+    return redirect(url_for('release_detail', release_name=release_name))
+
 @app.route('/delete_release', methods=['POST'])
 def delete_release():
     g.releases.destroy_release(request.form['release_name'])
@@ -134,4 +153,9 @@ if __name__ == '__main__':
     configs.extend(sys.argv[1:])
     for config_module in configs:
         app.config.from_object(config_module)
-    app.run()
+    import logging
+    from logging import FileHandler
+    file_handler = FileHandler('releasemonkey.log')
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+    app.run(debug=True)

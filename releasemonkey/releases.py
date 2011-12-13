@@ -84,6 +84,28 @@ class SqliteReleases(object):
     def suggested_release_name(self):
         return "sqlite_suggested_release"
 
+    def add_commit_to_release(self, release, commit):
+        try:
+            self.db_session.add(Commit(release_id=release.id,
+                                       revision=commit.revision,
+                                       msg=commit.msg,
+                                       author=commit.author,
+                                       link=commit.link))
+            self.db_session.commit()
+        except:
+            self.db_session.rollback()
+            raise
+
+    def change_to_revision(self, release, new_to_revision):
+        release.to_revision = new_to_revision
+
+        try:
+            self.db_session.add(release)
+            self.db_session.commit()
+        except:
+            self.db_session.rollback()
+            raise
+        
     def create_release(self, release_name, from_revision, to_revision, commits):
         rel = Release(release_name, from_revision, to_revision, True)
 

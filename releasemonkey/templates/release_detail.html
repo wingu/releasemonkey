@@ -6,6 +6,19 @@
   <div class="clearfix">
     <input type="search" class="filter" placeholder="Filter commits" />
     <p>Revisions {{ release.from_revision }} to {{ release.to_revision }}</p>
+    <div>
+      <form action="{{ url_for('alter_release', release_name=release.name) }}" method="POST">
+	<div class="clearfix">
+	  <label for="from_revision">Extend to revision: </label>
+	  <div class="input">
+	    <input type="text" id="new_to_revision" name="new_to_revision" 
+		   value="" />
+	  </div>
+	<input type="submit" class="btn primary" value="Extend Release" />
+	</div>
+      </form>
+    </div>
+   
   </div>
   <table class="zebra-striped commits">
     <tr class="headers">
